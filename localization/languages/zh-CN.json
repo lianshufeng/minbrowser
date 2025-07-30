@@ -198,6 +198,7 @@
     /* app menu */
     "appMenuFile": "文件",
     "appMenuNewTab": "新标签页",
+    "appMenuSetIsolatedSessionTab": "设置独立会话",
     "appMenuDuplicateTab": "复制标签页",
     "appMenuNewPrivateTab": "新隐私标签页",
     "appMenuNewTask": "新标签组",

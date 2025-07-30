@@ -198,6 +198,7 @@
     /* app menu */
     "appMenuFile": "File",
     "appMenuNewTab": "New Tab",
+    "setIsolatedSession": "Set Isolated Session",
     "appMenuDuplicateTab": "Duplicate Tab",
     "appMenuNewPrivateTab": "New Private Tab",
     "appMenuNewTask": "New Task",

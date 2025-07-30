@@ -198,6 +198,7 @@
     /* app menu */
     "appMenuFile": "檔案",
     "appMenuNewTab": "新分頁",
+    "appMenuSetIsolatedSessionTab": "設定獨立會話",
     "appMenuDuplicateTab": "複製分頁",
     "appMenuNewPrivateTab": "新無痕分頁",
     "appMenuNewTask": "新工作",

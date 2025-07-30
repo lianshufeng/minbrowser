@@ -3,11 +3,18 @@ const browserUI = require('browserUI.js')
 const webviews = require('webviews.js')
 const readerView = require('readerView.js')
 const urlParser = require('util/urlParser.js')
+const { ipcRenderer } = require('electron')
 
 const tabContextMenu = {
   show: function (tabId) {
     const tabMenu = [
       [
+        {
+          label: l('appMenuSetIsolatedSessionTab'),
+          click: function () {
+            ipcRenderer.send('open-isolated-session-setting', tabId)
+          }
+        },
         {
           label: l('appMenuDuplicateTab'),
           click: function () {
@@ -59,7 +66,7 @@ const tabContextMenu = {
       }
     }
 
-    tabMenu[0].push( {
+    tabMenu[0].push({
       label: l('tabMenuReload'),
       click: function () {
         if (tabs.get(tabId).url.startsWith(webviews.internalPages.error)) {
