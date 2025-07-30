@@ -75,8 +75,9 @@ function showUpdateNotification (text, input, inputFlags) {
   }
 }
 
-setTimeout(getAvailableUpdates, 30000)
-setInterval(getAvailableUpdates, 24 * 60 * 60 * 1000)
+// 禁用检查更新
+// setTimeout(getAvailableUpdates, 30000)
+// setInterval(getAvailableUpdates, 24 * 60 * 60 * 1000)
 
 function initialize () {
   searchbarPlugins.register('updateNotifications', {
