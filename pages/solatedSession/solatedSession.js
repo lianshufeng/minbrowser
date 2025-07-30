@@ -51,9 +51,12 @@ window.addEventListener('load', function () {
   document.getElementById('cancel').addEventListener('click', cancel)
 })
 
-
 ipcRenderer.on('init-config', (event, data) => {
   if (data && data.config) {
+
+    ipcRenderer.send('load-task-config', {})
+
+    document.title = '[' + data.config.tabName + ']\t 设置隔离会话'
     document.getElementById('ua').value = data.config.ua || ''
     document.getElementById('proxy').value = data.config.proxy || ''
     document.getElementById('isCookies').checked = !!data.config.isCookies

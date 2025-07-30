@@ -1,6 +1,6 @@
 let win = null
 
-function showSettingWindow (tabId, config = {}) {
+function showSettingWindow (tabId, tabName, config = {}) {
   if (win) {
     win.focus()
     return
@@ -23,29 +23,41 @@ function showSettingWindow (tabId, config = {}) {
       nodeIntegration: false,
       sandbox: true,
       contextIsolation: true,
-      preload:  __dirname + '/pages/solatedSession/solatedSession.js'
+      preload: __dirname + '/pages/solatedSession/solatedSession.js'
     }
   })
 
   // win.loadFile('setting-window.html')
   win.loadURL('min://app/pages/solatedSession/index.html')
+
   win.once('ready-to-show', () => win.show())
 
   // 关闭时清空引用
   win.on('closed', () => win = null)
 
+
+  sendIPCToWindow(windows.getCurrent(), 'load-task-config',{ tabId, config })
+
   // 向窗口发送参数（可选）
   win.webContents.once('did-finish-load', () => {
+    config = {
+      tabName: tabName,
+      tabId: tabId
+    }
     win.webContents.send('init-config', { tabId, config })
   })
 
-  // win.webContents.openDevTools({ mode: 'detach' })
+  win.webContents.openDevTools({ mode: 'detach' })
 }
 
-ipc.on('open-isolated-session-setting', function (e, tabId) {
-  showSettingWindow(tabId)
+ipc.on('open-isolated-session-setting', function (e, tabId, tabName) {
+  showSettingWindow(tabId, tabName)
 })
 
 ipc.on('set-isolated-session-config', function (e, ua, proxy, isCookies, platformType, platformAccountName) {
   console.log('set-isolated-session-config', ua, proxy, isCookies, platformType, platformAccountName)
 })
+
+// ipc.on('isolated-session-config', function (e, config) {
+//   console.log('isolated-session-config', config)
+// })
