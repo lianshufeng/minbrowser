@@ -35,29 +35,28 @@ function showSettingWindow (tabId, tabName, config = {}) {
   // 关闭时清空引用
   win.on('closed', () => win = null)
 
-
-  sendIPCToWindow(windows.getCurrent(), 'load-task-config',{ tabId, config })
-
   // 向窗口发送参数（可选）
   win.webContents.once('did-finish-load', () => {
-    config = {
-      tabName: tabName,
-      tabId: tabId
-    }
-    win.webContents.send('init-config', { tabId, config })
+
+    // 从渲染进程总中加载tab配置
+    sendIPCToWindow(windows.getCurrent(), 'load-tab-config-isolated-session', { tabId: tabId, config: config })
+
+    // 载入tab的配置并发给页面
+    ipc.once('tab-config-isolated-session', (event, data) => {
+      win.webContents.send('init-config', { tabId: tabId, tab: data })
+    })
+
   })
 
-  win.webContents.openDevTools({ mode: 'detach' })
+  // 订阅修改
+  ipc.on('update-isolated-session-config', (event, data) => {
+    sendIPCToWindow(windows.getCurrent(), 'update-isolated-session-config', data)
+  })
+
+  // win.webContents.openDevTools({ mode: 'detach' })
 }
 
-ipc.on('open-isolated-session-setting', function (e, tabId, tabName) {
-  showSettingWindow(tabId, tabName)
+ipc.on('open-isolated-session-setting', function (e, tabId) {
+  showSettingWindow(tabId)
 })
 
-ipc.on('set-isolated-session-config', function (e, ua, proxy, isCookies, platformType, platformAccountName) {
-  console.log('set-isolated-session-config', ua, proxy, isCookies, platformType, platformAccountName)
-})
-
-// ipc.on('isolated-session-config', function (e, config) {
-//   console.log('isolated-session-config', config)
-// })

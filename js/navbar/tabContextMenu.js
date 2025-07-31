@@ -12,8 +12,7 @@ const tabContextMenu = {
         {
           label: l('appMenuSetIsolatedSessionTab'),
           click: function () {
-            const sourceTab = tabs.get(tabId)
-            ipcRenderer.send('open-isolated-session-setting', tabId, sourceTab.title)
+            ipcRenderer.send('open-isolated-session-setting', tabId)
           }
         },
         {

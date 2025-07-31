@@ -108,7 +108,7 @@ const webviews = {
   },
   events: [],
   IPCEvents: [],
-  hasViewForTab: function(tabId) {
+  hasViewForTab: function (tabId) {
     return tabId && tasks.getTaskContainingTab(tabId) && tasks.getTaskContainingTab(tabId).tabs.get(tabId).hasWebContents
   },
   bindEvent: function (event, fn) {
@@ -179,6 +179,8 @@ const webviews = {
   add: function (tabId, existingViewId) {
     var tabData = tabs.get(tabId)
 
+    console.log('createView', tabId, tabData)
+
     // needs to be called before the view is created to that its listeners can be registered
     if (tabData.scrollPosition) {
       scrollOnLoad(tabId, tabData.scrollPosition)
@@ -190,16 +192,26 @@ const webviews = {
 
     // if the tab is private, we want to partition it. See http://electron.atom.io/docs/v0.34.0/api/web-view-tag/#partition
     // since tab IDs are unique, we can use them as partition names
-    if (tabData.private === true) {
+    const webPreferences = {}
+    if (tabData.solatedSession) {
+      if (tabData.solatedSession.isSolated) {
+        webPreferences['partition'] = 'persist:' + tabData.id
+      }
+      if (tabData.solatedSession.ua) {
+        webPreferences['userAgent'] = tabData.solatedSession.ua
+      }
+      if (tabData.solatedSession.proxy) {
+        webPreferences['proxy'] = tabData.solatedSession.proxy
+      }
+    } else if (tabData.private === true) {
       var partition = tabId.toString() // options.tabId is a number, which remote.session.fromPartition won't accept. It must be converted to a string first
+      webPreferences = { partition: partition }
     }
 
     ipc.send('createView', {
       existingViewId,
       id: tabId,
-      webPreferences: {
-        partition: partition || 'persist:webcontent'
-      },
+      webPreferences: webPreferences,
       boundsString: JSON.stringify(webviews.getViewBounds()),
       events: webviews.events.map(e => e.event).filter((i, idx, arr) => arr.indexOf(i) === idx)
     })

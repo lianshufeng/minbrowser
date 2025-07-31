@@ -36,6 +36,8 @@ function createView (existingViewId, id, webPreferences, boundsString, events) {
 
   const viewPrefs = Object.assign({}, getDefaultViewWebPreferences(), webPreferences)
 
+  console.log('viewPrefs', viewPrefs)
+
   viewStateMap[id] = {
     loadedInitialURL: false,
     hasJS: viewPrefs.javascript // need this later to see if we should swap the view for a JS-enabled one
@@ -51,6 +53,12 @@ function createView (existingViewId, id, webPreferences, boundsString, events) {
     viewStateMap[id].loadedInitialURL = true
   } else {
     view = new WebContentsView({ webPreferences: viewPrefs })
+  }
+
+  // 代理设置建议在 createView 外部或者 view 创建后立刻设置
+  if (viewPrefs.proxy) {
+    const session = view.webContents.session
+    session.setProxy({ proxyRules: viewPrefs.proxy })
   }
 
   events.forEach(function (event) {
