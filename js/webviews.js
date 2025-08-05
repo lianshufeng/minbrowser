@@ -177,9 +177,9 @@ const webviews = {
     }
   },
   add: function (tabId, existingViewId) {
-    var tabData = tabs.get(tabId)
+    console.log('webview : add', tabId, existingViewId)
 
-    console.log('createView', tabId, tabData)
+    var tabData = tabs.get(tabId)
 
     // needs to be called before the view is created to that its listeners can be registered
     if (tabData.scrollPosition) {
@@ -195,7 +195,14 @@ const webviews = {
     const webPreferences = {}
     if (tabData.solatedSession) {
       if (tabData.solatedSession.isSolated) {
-        webPreferences['partition'] = 'persist:' + tabData.id
+        console.log(tabData)
+        // 将类型转换为名称
+        let platformName = tabData.solatedSession.platformName
+        if (tabData.solatedSession.platformType !== 'other') {
+          platformName = tabData.solatedSession.platformType
+        }
+
+        webPreferences['partition'] = 'persist:' + platformName + '-' + tabData.solatedSession.platformAccountName
       }
       if (tabData.solatedSession.ua) {
         webPreferences['userAgent'] = tabData.solatedSession.ua

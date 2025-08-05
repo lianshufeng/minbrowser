@@ -1,14 +1,16 @@
+const webviews = require('./webviews')
 const SolatedSession = {
-  // loadTabConfigIsolatedSession: function (event, data) {
-  //   ipc.send('tab-config-isolated-session', tabs.get(data.tabId))
-  // },
-  // loadTabConfigViewManager: function (event, data) {
-  //   ipc.send('tab-config-view-manager', tabs.get(data.tabId))
-  // },
+
   updateIsolatedSessionConfig: function (event, data) {
     tabs.update(data.tabId, {
       'solatedSession': data.config
     })
+    // todo 重置webview
+    webviews.destroy(data.tabId)
+    webviews.add(data.tabId)
+    if (data.tabId === tabs.getSelected()) {
+      webviews.setSelected(data.tabId)
+    }
   },
   loadTabConfig: function (channel, event, data) {
     // console.log(channel, event, data)
@@ -17,9 +19,7 @@ const SolatedSession = {
     ipc.send(outChannel, tabs.get(data.tabId))
   },
   initialize: function () {
-    // ipc.on('load-tab-config-isolated-session', SolatedSession.loadTabConfigIsolatedSession)
-    // ipc.on('load-tab-config-view-manager', SolatedSession.loadTabConfigViewManager)
-    // 自动注册，然后将load去掉
+
     const TAB_CONFIG_CHANNELS = [
       'load-tab-config-isolated-session',
       'load-tab-config-view-manager'

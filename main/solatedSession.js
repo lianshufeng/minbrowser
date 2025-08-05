@@ -7,7 +7,7 @@ function showSettingWindow (tabId, tabName, config = {}) {
   }
   win = new BrowserWindow({
     width: 480,
-    height: 640,
+    height: 710,
     minWidth: 480,
     minHeight: 640,
     maxWidth: 600,

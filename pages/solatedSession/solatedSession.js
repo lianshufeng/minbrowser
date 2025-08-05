@@ -1,27 +1,3 @@
-// document.getElementById('ok').onclick = function () {
-//   const ua = document.getElementById('ua').value.trim()
-//   const proxy = document.getElementById('proxy').value.trim()
-//   const isCookies = document.getElementById('isCookies').checked
-//   const platformType = document.getElementById('platformType').value
-//   const platformAccountName = document.getElementById('platformAccountName').value.trim()
-//   // ipcRenderer.send('set-isolated-session-config', {
-//   //   ua, proxy, isCookies, platformType, platformAccountName
-//   // })
-//   window.close()
-// }
-// ipcRenderer.on('init-config', (event, data) => {
-//   if (data && data.config) {
-//     document.getElementById('ua').value = data.config.ua || ''
-//     document.getElementById('proxy').value = data.config.proxy || ''
-//     document.getElementById('isCookies').checked = !!data.config.isCookies
-//     document.getElementById('platformType').value = data.config.platformType || ''
-//     document.getElementById('platformAccountName').value = data.config.platformAccountName || ''
-//   }
-// })
-// window.onload = () => {
-//   document.getElementById('platformType').focus()
-// }
-
 const { ipcRenderer } = require('electron')
 
 function cancel () {
@@ -34,22 +10,57 @@ function response () {
   const isSolated = document.getElementById('isSolated').checked
   const platformType = document.getElementById('platformType').value
   const platformAccountName = document.getElementById('platformAccountName').value.trim()
+
+  let platformName = ''
+  if (platformType === 'other') {
+    platformName = document.getElementById('customPlatform').value.trim()
+  }
+
+
+
+  // ---- 校验逻辑 ----
+  if (isSolated) {
+    if (!platformType) {
+      alert('请选择平台类型')
+      document.getElementById('platformType').focus()
+      return
+    }
+    if (platformType === 'other' && !platformName) {
+      alert('请输入自定义平台名称')
+      document.getElementById('customPlatform').focus()
+      return
+    }
+    if (!platformAccountName) {
+      alert('请输入平台账号名称')
+      document.getElementById('platformAccountName').focus()
+      return
+    }
+  }
+  // ---- 校验结束 ----
+
+
+
   ipcRenderer.send('update-isolated-session-config', {
     tabId: window.tabId,
     config: {
-      ua, proxy, isSolated, platformType, platformAccountName
+      ua, proxy, isSolated, platformType, platformName, platformAccountName
     }
   })
   window.close()
 }
 
 document.addEventListener('DOMContentLoaded', function () {
-  // 平台类型
   document.getElementById('platformType').focus()
-
+  document.getElementById('platformType').addEventListener('change', function () {
+    if (this.value === 'other') {
+      document.getElementById('customPlatformGroup').style.display = 'block'
+    } else {
+      document.getElementById('customPlatformGroup').style.display = 'none'
+      document.getElementById('customPlatform').value = ''
+    }
+  })
 })
 
-// 页面加载
 window.addEventListener('load', function () {
   document.getElementById('ok').addEventListener('click', response)
   document.getElementById('cancel').addEventListener('click', cancel)
@@ -63,13 +74,24 @@ ipcRenderer.on('init-config', (event, data) => {
       proxy: '',
       isSolated: false,
       platformType: '',
+      platformName: '',
       platformAccountName: ''
     }
     window.tabId = data.tab.id
     document.getElementById('ua').value = solatedSession.ua
     document.getElementById('proxy').value = solatedSession.proxy
     document.getElementById('isSolated').checked = !!solatedSession.isSolated
-    document.getElementById('platformType').value = solatedSession.platformType
     document.getElementById('platformAccountName').value = solatedSession.platformAccountName
+
+    // 回显类型和名称
+    const platformTypeSelect = document.getElementById('platformType')
+    platformTypeSelect.value = solatedSession.platformType || ''
+    if (solatedSession.platformType === 'other') {
+      document.getElementById('customPlatformGroup').style.display = 'block'
+      document.getElementById('customPlatform').value = solatedSession.platformName || ''
+    } else {
+      document.getElementById('customPlatformGroup').style.display = 'none'
+      document.getElementById('customPlatform').value = ''
+    }
   }
 })
