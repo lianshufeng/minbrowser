@@ -36,8 +36,6 @@ function createView (existingViewId, id, webPreferences, boundsString, events) {
 
   const viewPrefs = Object.assign({}, getDefaultViewWebPreferences(), webPreferences)
 
-  console.log('viewPrefs', viewPrefs)
-
   viewStateMap[id] = {
     loadedInitialURL: false,
     hasJS: viewPrefs.javascript // need this later to see if we should swap the view for a JS-enabled one

@@ -168,6 +168,7 @@ require('bookmarkConverter.js').initialize()
 require('newTabPage.js').initialize()
 require('macHandoff.js').initialize()
 require('solatedSession').initialize()
+require('monitorPage').initialize()
 
 // default searchbar plugins
 

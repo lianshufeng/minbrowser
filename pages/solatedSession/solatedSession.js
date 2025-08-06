@@ -16,29 +16,22 @@ function response () {
     platformName = document.getElementById('customPlatform').value.trim()
   }
 
-
-
   // ---- 校验逻辑 ----
   if (isSolated) {
     if (!platformType) {
       alert('请选择平台类型')
-      document.getElementById('platformType').focus()
       return
     }
     if (platformType === 'other' && !platformName) {
       alert('请输入自定义平台名称')
-      document.getElementById('customPlatform').focus()
       return
     }
     if (!platformAccountName) {
       alert('请输入平台账号名称')
-      document.getElementById('platformAccountName').focus()
       return
     }
   }
   // ---- 校验结束 ----
-
-
 
   ipcRenderer.send('update-isolated-session-config', {
     tabId: window.tabId,

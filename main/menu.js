@@ -99,6 +99,13 @@ function buildAppMenu (options = {}) {
     }
   }
 
+  var monitorPageAction = {
+    label: l('appMenuMonitorPage'),
+    click: function (item, window) {
+      openMonitorPage()
+    }
+  }
+
   var template = [
     ...(options.secondary ? tabTaskActions : []),
     ...(options.secondary ? [{ type: 'separator' }] : []),
@@ -281,9 +288,9 @@ function buildAppMenu (options = {}) {
               windows.getAll().forEach(win => sendIPCToWindow(win, 'enterFocusMode'))
 
               // wait to show the message until the tabs have been hidden, to make the message less confusing
-              setTimeout(function() {
+              setTimeout(function () {
                 showFocusModeDialog1()
-              }, 16);
+              }, 16)
             }
           }
         },
@@ -373,7 +380,7 @@ function buildAppMenu (options = {}) {
                   }
                 }
               }
-            // otherwise, this event will be handled in the main window
+              // otherwise, this event will be handled in the main window
             }
           },
           {
@@ -381,7 +388,7 @@ function buildAppMenu (options = {}) {
             type: 'checkbox',
             checked: settings.get('windowAlwaysOnTop') || false,
             click: function (item, window) {
-              windows.getAll().forEach(function(win) {
+              windows.getAll().forEach(function (win) {
                 win.setAlwaysOnTop(item.checked)
               })
               settings.set('windowAlwaysOnTop', item.checked)
@@ -443,6 +450,8 @@ function buildAppMenu (options = {}) {
         }] : [])
       ]
     },
+    ...(options.secondary ? [{ type: 'separator' }] : []),
+    ...(options.secondary ? [monitorPageAction] : []), // 监控页
     ...(options.secondary && process.platform !== 'darwin' ? [{ type: 'separator' }] : []),
     ...(options.secondary && process.platform !== 'darwin' ? [quitAction] : [])
   ]

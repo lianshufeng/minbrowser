@@ -1,0 +1,57 @@
+body {
+    background: #f6f6f6;
+    font-family: "Segoe UI", "Arial", sans-serif;
+}
+
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* 3列 */
+    grid-gap: 24px;
+    padding: 32px;
+    max-width: 1024px;
+    margin: 0 auto;
+}
+
+.tab-item {
+    background: #fff;
+    border-radius: 18px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.07);
+    overflow: hidden;
+    transition: transform 0.15s;
+    cursor: pointer;
+}
+
+.tab-item:hover {
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+
+.tab-snapshot {
+    width: 100%;
+    aspect-ratio: 16/10;
+    object-fit: cover;
+    background: #ddd;
+    display: block;
+}
+
+.tab-info {
+    padding: 12px 14px;
+}
+
+.tab-title {
+    font-weight: 600;
+    font-size: 1rem;
+    color: #222;
+    margin-bottom: 4px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.tab-url {
+    font-size: 0.9rem;
+    color: #666;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}

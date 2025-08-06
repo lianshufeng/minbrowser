@@ -177,8 +177,6 @@ const webviews = {
     }
   },
   add: function (tabId, existingViewId) {
-    console.log('webview : add', tabId, existingViewId)
-
     var tabData = tabs.get(tabId)
 
     // needs to be called before the view is created to that its listeners can be registered

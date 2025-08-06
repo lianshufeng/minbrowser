@@ -241,6 +241,7 @@
     "appMenuHide": "Hide %n",
     "appMenuHideOthers": "Hide Others",
     "appMenuShowAll": "Show All",
+    "appMenuMonitorPage": "Monitor Page",
     "appMenuQuit": "Quit %n",
     "appMenuBringToFront": "Bring All to Front",
     /* Tab menu */

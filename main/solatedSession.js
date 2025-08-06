@@ -15,7 +15,7 @@ function showSettingWindow (tabId, tabName, config = {}) {
     parent: windows.getCurrent(), // 可选
     show: false,
     modal: true,
-    alwaysOnTop: true,
+    alwaysOnTop: false,
     title: '设置独立会话',
     autoHideMenuBar: true,
     frame: true, // 必须为 true，才有关闭按钮

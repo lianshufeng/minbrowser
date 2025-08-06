@@ -24,7 +24,8 @@ const modules = [
   'main/keychainService.js',
   'js/util/proxy.js',
   'main/themeMain.js',
-  'main/solatedSession.js'
+  'main/solatedSession.js',
+  'main/monitorPage.js'
 ]
 
 function buildMain () {

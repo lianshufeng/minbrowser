@@ -241,6 +241,7 @@
     "appMenuHide": "隱藏 %n",
     "appMenuHideOthers": "隱藏其他",
     "appMenuShowAll": "顯示全部",
+    "appMenuMonitorPage": "监控页面",
     "appMenuQuit": "結束 %n",
     "appMenuBringToFront": "顯示所有視窗",
     /* Tab menu */
