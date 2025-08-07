@@ -21,11 +21,33 @@ function openMonitorPage () {
     }
   })
 
+  let winHandle = new Date().getTime()
+
+  // 转发请求
+  let forward_channels = ['get-all-tabs']
+  forward_channels.forEach((name) => {
+    // 拼接方法，防止窗口卸载后也收到消息
+    let methodName = name + '-' + winHandle
+    ipc.on(methodName, (event, data) => {
+      if (data && data.outChannel) {
+        outChannel = data.outChannel
+        ipc.once(outChannel, (event, data) => {
+          win.webContents.send(outChannel, data)
+        })
+      }
+      // 调用js渲染进程
+      sendIPCToWindow(windows.getCurrent(), name, data)
+    })
+  })
+
   win.loadURL('min://app/pages/monitorPage/index.html')
   // win.once('ready-to-show', () => win.show())
   // win.on('closed', () => win = null)
   // 向窗口发送参数（可选）
   win.webContents.once('did-finish-load', () => {
+
+    // 发送当前窗口创建的id
+    win.webContents.send('init-monitor-page-config', { winHandle: winHandle })
 
   })
 
@@ -33,9 +55,7 @@ function openMonitorPage () {
   win.webContents.openDevTools({ mode: 'detach' })
 }
 
-// 转发请求
-['get-all-tabs'].forEach((name) => {
-  ipc.on(name, (event, data) => {
-    sendIPCToWindow(windows.getCurrent(), name, data)
-  })
+// 定义选择tab
+ipc.on('set-tab-selected', (event, data) => {
+  sendIPCToWindow(windows.getCurrent(), 'set-tab-selected', data)
 })

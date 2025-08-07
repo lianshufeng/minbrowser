@@ -7,15 +7,41 @@
     <link rel="stylesheet" href="monitorPage.css"/>
 </head>
 <body>
-<div class="grid-container">
-    <!-- 单个格子，可以用 JS 动态生成多个 -->
-    <div class="tab-item">
-        <img class="tab-snapshot" src="https://dummyimage.com/320x200/ddd/888.png&text=Tab+1" alt="Tab 1">
-        <div class="tab-info">
-            <div class="tab-title">百度一下，你就知道</div>
-            <div class="tab-url">https://www.baidu.com</div>
-        </div>
+
+<div class="settings-panel">
+    <div class="setting-group">
+        <label class="setting-label">
+            页面刷新间隔（秒）：
+            <input type="number" class="setting-input" min="1" value="120" />
+        </label>
+        <label class="setting-switch">
+            <input type="checkbox" class="setting-checkbox" />
+            <span>开启</span>
+        </label>
+    </div>
+    <div class="setting-group">
+        <label class="setting-label">
+            页面快照间隔（秒）：
+            <input type="number" class="setting-input" min="1" value="5" />
+        </label>
+        <label class="setting-switch">
+            <input type="checkbox" class="setting-checkbox" />
+            <span>开启</span>
+        </label>
     </div>
 </div>
+
+<div class="grid-container">
+    <!-- 单个格子，可以用 JS 动态生成多个 -->
+    <!--    <div class="tab-item">-->
+    <!--        <img class="tab-snapshot" src="https://dummyimage.com/320x200/ddd/888.png&text=Tab+1" alt="Tab 1">-->
+    <!--        <div class="tab-info">-->
+    <!--            <div class="tab-title">百度一下，你就知道</div>-->
+    <!--            <div class="tab-url">https://www.baidu.com</div>-->
+    <!--        </div>-->
+    <!--    </div>-->
+</div>
+
 </body>
 </html>
+
