@@ -74,12 +74,12 @@ body {
 
 .grid-container {
     display: grid;
-    grid-template-columns: repeat(3, 1fr); /* 3列 */
+    grid-template-columns: repeat(5, 1fr); /* 3列 */
     grid-gap: 24px;
     padding: 32px;
     margin: 0 auto;
     /* ...原有样式... */
-    max-height: 600px;
+    max-height: 700px;
     overflow-y: auto;
 }
 

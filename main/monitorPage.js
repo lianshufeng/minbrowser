@@ -24,7 +24,7 @@ function openMonitorPage () {
   let winHandle = new Date().getTime()
 
   // 转发请求
-  let forward_channels = ['get-all-tabs']
+  let forward_channels = ['get-all-tabs', 'get-tab-selected']
   forward_channels.forEach((name) => {
     // 拼接方法，防止窗口卸载后也收到消息
     let methodName = name + '-' + winHandle
@@ -55,7 +55,34 @@ function openMonitorPage () {
   win.webContents.openDevTools({ mode: 'detach' })
 }
 
-// 定义选择tab
+// 选择tab
 ipc.on('set-tab-selected', (event, data) => {
   sendIPCToWindow(windows.getCurrent(), 'set-tab-selected', data)
+})
+
+ipc.on('tab-view-capture', (event, data) => {
+  const view = getView(data.id)
+  try {
+    if (view && view.webContents) {
+      view.webContents.capturePage().then(function (img) {
+        var size = img.getSize()
+        if (size.width === 0 && size.height === 0) {
+          return
+        }
+        img = img.resize({ width: data.width, height: data.height })
+        if (data.outChannel) {
+          event.sender.send(data.outChannel, { id: data.id, url: img.toDataURL() })
+        }
+      })
+    }
+  } catch (err) {
+    console.error(err)
+  }
+})
+
+ipc.on('refresh-tab-view', (event, data) => {
+  const view = getView(data.id)
+  if (view && view.webContents) {
+    view.webContents.reload()
+  }
 })

@@ -1,6 +1,9 @@
 // tabs-snapshot.js
 const { ipcRenderer } = require('electron')
 
+let refreshTimer = null
+let snapshotTimer = null
+
 function getAllTabsSnapshots (winHandle) {
   return new Promise((resolve, reject) => {
     // 请求主进程拿到所有tab的信息
@@ -31,7 +34,7 @@ function renderSnapshotsGrid (snapshots) {
     // 判断 imageUrl 是否为空
     const imgUrl = tab.imageUrl ? tab.imageUrl : './load.png'
     div.innerHTML = `
-      <img class="tab-snapshot" src="${imgUrl}" alt="${tab.title}">
+      <img id="tab-snapshot-img-${tab.id}" class="tab-snapshot" src="${imgUrl}" alt="${tab.title}">
       <div class="tab-info">
         <div class="tab-title">${tab.title}</div>
         <div class="tab-url">${tab.url}</div>
@@ -39,52 +42,123 @@ function renderSnapshotsGrid (snapshots) {
     `
     div.onclick = () => {
       ipcRenderer.send('set-tab-selected', { id: tab.id })
+      if (snapshotTimer) {
+        clearInterval(snapshotTimer)
+      }
+      document.getElementById('snapshot-enable').checked = false
     }
     grid.appendChild(div)
   })
 }
 
-/**
- * 刷新tab的视图缩略图
- * @param snapshot
- */
-function refreshTabView (snapshot) {
-  snapshot.forEach(tab => {
-    ipcRenderer.send('getCapture', {
-      id: tab.id,
-      width: 320,
-      height: 240
-    })
-  })
-}
-
-async function snapshotsPages (data) {
+async function snapshotsTabs (data) {
   try {
     // 取出所有的tab
     const snapshot = await getAllTabsSnapshots(data.winHandle)
     // 渲染所有的tab
     renderSnapshotsGrid(snapshot)
     // 刷新tab的视图
-    refreshTabView(snapshot)
+    // refreshTabView(snapshot)
   } catch (err) {
 
   } finally {
     setTimeout(async () => {
-      await snapshotsPages(data)
+      await snapshotsTabs(data)
     }, 3000)
   }
 }
 
-// window.addEventListener('DOMContentLoaded', async () => {
-//   // 加载快照并渲染九宫格
-//   setTimeout(snapshotsPages, 3000)
-// })
+async function getCurrentTab (winHandle) {
+  // outChannel
+  return new Promise((resolve, reject) => {
+    const outChannel = 'get-tab-selected-' + new Date().getTime()
+    ipcRenderer.once(outChannel, (event, data) => {
+      return resolve(data)
+    })
+    ipcRenderer.send('get-tab-selected-' + winHandle, { outChannel: outChannel })
+  })
+}
+
+// 执行逻辑可自定义
+async function refreshAction (data) {
+  console.log('刷新！', data)
+  const snapshot = await getAllTabsSnapshots(data.winHandle)
+  snapshot.forEach(tab => {
+    ipcRenderer.send('refresh-tab-view', { id: tab.id })
+  })
+}
+
+async function snapshotAction (data) {
+  const snapshot = await getAllTabsSnapshots(data.winHandle)
+  const currentTab = await getCurrentTab(data.winHandle)
+  const index = snapshot.findIndex(tab => tab.id === currentTab.id)
+  if (index > -1) {
+    let nextIndex = index + 1
+    if (nextIndex >= snapshot.length) {
+      nextIndex = 0
+    }
+    const tab = snapshot[nextIndex]
+    await ipcRenderer.send('set-tab-selected', { id: tab.id })
+
+    const outChannel = 'tab-view-capture-' + new Date().getTime()
+    ipcRenderer.once(outChannel, (event, data) => {
+      document.getElementById('tab-snapshot-img-' + tab.id).setAttribute('src', data.url)
+    })
+
+    await ipcRenderer.send('tab-view-capture', {
+      id: tab.id, width: 320, height: 240, outChannel: outChannel
+    })
+
+  }
+
+}
 
 ipcRenderer.once('init-monitor-page-config', (event, data) => {
 
   // 加载快照并渲染九宫格
   setTimeout(async () => {
-    await snapshotsPages(data)
+    await snapshotsTabs(data)
   }, 3000)
+
+  document.getElementById('refresh-enable').addEventListener('change', (e) => {
+    clearInterval(refreshTimer)
+    if (e.target.checked) {
+      const interval = Number(document.getElementById('refresh-interval').value) * 1000
+      refreshTimer = setInterval(async () => {
+        await refreshAction(data)
+      }, interval)
+    }
+  })
+
+  document.getElementById('snapshot-enable').addEventListener('change', (e) => {
+    clearInterval(snapshotTimer)
+    if (e.target.checked) {
+      const interval = Number(document.getElementById('snapshot-interval').value) * 1000
+      snapshotTimer = setInterval(async () => {
+        await snapshotAction(data)
+      }, interval)
+    }
+  })
+
+// 当间隔修改时自动重启对应定时器（如开着）
+  document.getElementById('refresh-interval').addEventListener('change', () => {
+    if (document.getElementById('refresh-enable').checked) {
+      clearInterval(refreshTimer)
+      const interval = Number(document.getElementById('refresh-interval').value) * 1000
+      refreshTimer = setInterval(async () => {
+        await refreshAction(data)
+      }, interval)
+    }
+  })
+
+  document.getElementById('snapshot-interval').addEventListener('change', () => {
+    if (document.getElementById('snapshot-enable').checked) {
+      clearInterval(snapshotTimer)
+      const interval = Number(document.getElementById('snapshot-interval').value) * 1000
+      snapshotTimer = setInterval(async () => {
+        await snapshotAction(data)
+      }, interval)
+    }
+  })
 
 })
