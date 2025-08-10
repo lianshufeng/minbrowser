@@ -161,4 +161,7 @@ ipcRenderer.once('init-monitor-page-config', (event, data) => {
     }
   })
 
+  // doto 需要找到如何初始化
+  console.log(settings)
+
 })

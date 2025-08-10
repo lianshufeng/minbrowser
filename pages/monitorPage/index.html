@@ -9,59 +9,81 @@
 <body>
 
 <div class="settings-panel">
-    <div class="setting-group">
-        <label class="setting-label" for="refresh-interval">
-            页面刷新间隔（秒）：
-            <input
-                    type="number"
-                    class="setting-input"
-                    min="1"
-                    value="120"
-                    id="refresh-interval"
-            />
-        </label>
-        <label class="setting-switch" for="refresh-enable">
-            <input
-                    type="checkbox"
-                    class="setting-checkbox"
-                    id="refresh-enable"
-            />
-            <span>开启</span>
-        </label>
+    <!-- 第一行 -->
+    <div class="settings-row">
+        <!-- 页面刷新 -->
+        <div class="setting-group">
+            <label class="setting-label" for="refresh-interval">
+                页面刷新间隔（秒）：
+                <input
+                        type="number"
+                        class="setting-input"
+                        min="1"
+                        value="120"
+                        id="refresh-interval"
+                />
+            </label>
+            <label class="setting-switch" for="refresh-enable">
+                <input type="checkbox" class="setting-checkbox" id="refresh-enable"/>
+                <span>开启</span>
+            </label>
+        </div>
+
+        <!-- 页面快照 -->
+        <div class="setting-group">
+            <label class="setting-label" for="snapshot-interval">
+                页面快照间隔（秒）：
+                <input
+                        type="number"
+                        class="setting-input"
+                        min="1"
+                        value="3"
+                        id="snapshot-interval"
+                />
+            </label>
+            <label class="setting-switch" for="snapshot-enable">
+                <input type="checkbox" class="setting-checkbox" id="snapshot-enable"/>
+                <span>开启</span>
+            </label>
+        </div>
     </div>
-    <div class="setting-group">
-        <label class="setting-label" for="snapshot-interval">
-            页面快照间隔（秒）：
-            <input
-                    type="number"
-                    class="setting-input"
-                    min="1"
-                    value="3"
-                    id="snapshot-interval"
-            />
-        </label>
-        <label class="setting-switch" for="snapshot-enable">
-            <input
-                    type="checkbox"
-                    class="setting-checkbox"
-                    id="snapshot-enable"
-            />
-            <span>开启</span>
-        </label>
+
+    <!-- 第二行 -->
+    <div class="settings-row">
+        <!-- 是否同步会话 -->
+        <div class="setting-group wide-group">
+            <label class="setting-label" for="sync-session-url">
+                是否同步会话：
+                <input
+                        type="url"
+                        class="setting-input long-input"
+                        id="sync-session-url"
+                        value="https://example.com/session-sync"
+                />
+            </label>
+            <label class="setting-switch" for="sync-session-enable">
+                <input type="checkbox" class="setting-checkbox" id="sync-session-enable"/>
+                <span>开启</span>
+            </label>
+        </div>
     </div>
 </div>
 
 <div class="grid-container">
-    <!-- 单个格子，可以用 JS 动态生成多个 -->
-    <!--    <div class="tab-item">-->
-    <!--        <img class="tab-snapshot" src="https://dummyimage.com/320x200/ddd/888.png&text=Tab+1" alt="Tab 1">-->
-    <!--        <div class="tab-info">-->
-    <!--            <div class="tab-title">百度一下，你就知道</div>-->
-    <!--            <div class="tab-url">https://www.baidu.com</div>-->
-    <!--        </div>-->
-    <!--    </div>-->
+    <!-- 单个格子示例 -->
+    <!--
+    <div class="tab-item">
+        <img class="tab-snapshot" src="https://dummyimage.com/320x200/ddd/888.png&text=Tab+1" alt="Tab 1">
+        <div class="tab-info">
+            <div class="tab-title">百度一下，你就知道</div>
+            <div class="tab-url">https://www.baidu.com</div>
+        </div>
+    </div>
+    -->
 </div>
 
 </body>
-</html>
 
+<script src="../../js/util/settings/settingsContent.js"></script>
+
+</html>
