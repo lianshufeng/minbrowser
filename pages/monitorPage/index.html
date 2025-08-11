@@ -53,12 +53,22 @@
         <!-- 是否同步会话 -->
         <div class="setting-group wide-group">
             <label class="setting-label" for="sync-session-url">
-                是否同步会话：
+                同步地址：
                 <input
                         type="url"
                         class="setting-input long-input"
                         id="sync-session-url"
                         value=""
+                />
+            </label>
+            <label class="setting-label" for="snapshot-interval">
+                同步间隔（秒）：
+                <input
+                        type="number"
+                        class="setting-input"
+                        min="1"
+                        value="600"
+                        id="sync-session-interval"
                 />
             </label>
             <label class="setting-switch" for="sync-session-enable">
