@@ -1,8 +1,27 @@
 // tabs-snapshot.js
 const { ipcRenderer } = require('electron')
 
+// const { settings } = require('../../js/util/settings/settingsContent.js')
+
 let refreshTimer = null
 let snapshotTimer = null
+let monitorPageConfig = null
+
+function getSettingConfig (winHandle, key, defaultValue) {
+  return new Promise((resolve, reject) => {
+    const command = 'get-setting-config'
+    // 请求主进程拿到所有tab的信息
+    const outChannel = command + '-' + new Date().getTime()
+    ipcRenderer.once(outChannel, (event, data) => {
+      resolve(data)
+    })
+    ipcRenderer.send(command + '-' + winHandle, {
+      outChannel: outChannel,
+      key: key,
+      value: defaultValue
+    })
+  })
+}
 
 function getAllTabsSnapshots (winHandle) {
   return new Promise((resolve, reject) => {
@@ -113,12 +132,18 @@ async function snapshotAction (data) {
 
 }
 
-ipcRenderer.once('init-monitor-page-config', (event, data) => {
+ipcRenderer.once('init-monitor-page-config', async (event, data) => {
 
   // 加载快照并渲染九宫格
   setTimeout(async () => {
     await snapshotsTabs(data)
   }, 3000)
+
+  // 加载默认配置
+  monitorPageConfig = await getSettingConfig(data.winHandle, 'monitorPageConfig', {
+    syncSessionUrl: 'https://example.com/session-sync',
+    syncSessionEnable: false
+  })
 
   document.getElementById('refresh-enable').addEventListener('change', (e) => {
     clearInterval(refreshTimer)
@@ -140,7 +165,7 @@ ipcRenderer.once('init-monitor-page-config', (event, data) => {
     }
   })
 
-// 当间隔修改时自动重启对应定时器（如开着）
+  // 当间隔修改时自动重启对应定时器（如开着）
   document.getElementById('refresh-interval').addEventListener('change', () => {
     if (document.getElementById('refresh-enable').checked) {
       clearInterval(refreshTimer)
@@ -162,6 +187,5 @@ ipcRenderer.once('init-monitor-page-config', (event, data) => {
   })
 
   // doto 需要找到如何初始化
-  console.log(settings)
 
 })

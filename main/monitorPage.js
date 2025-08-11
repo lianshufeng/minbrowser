@@ -21,16 +21,16 @@ function openMonitorPage () {
     }
   })
 
-  let winHandle = new Date().getTime()
+  const winHandle = new Date().getTime()
 
   // 转发请求
-  let forward_channels = ['get-all-tabs', 'get-tab-selected']
+  const forward_channels = ['get-all-tabs', 'get-tab-selected', 'get-setting-config', 'set-setting-config']
   forward_channels.forEach((name) => {
     // 拼接方法，防止窗口卸载后也收到消息
-    let methodName = name + '-' + winHandle
+    const methodName = name + '-' + winHandle
     ipc.on(methodName, (event, data) => {
       if (data && data.outChannel) {
-        outChannel = data.outChannel
+        const outChannel = data.outChannel
         ipc.once(outChannel, (event, data) => {
           win.webContents.send(outChannel, data)
         })
