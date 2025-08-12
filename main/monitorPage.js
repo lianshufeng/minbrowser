@@ -130,12 +130,13 @@ ipc.on('post-page-session', async (event, data) => {
     const platformCookies = cookies.filter(cookie => {
       // 只匹配以 .douyin.com 结尾的域名
       return cookie.domain.endsWith(solatedSession.platformType === 'other' ? '' : platformName)
-    }).map(cookie => `${cookie.name}=${cookie.value}`).join('; ')
+    }).map(cookie => `${cookie.name.trim()}=${cookie.value.trim()}`).join('; ')
 
     // 生成 cookies header 字符串
     // const cookieHeader = cookies.map(cookie => `${cookie.name}=${cookie.value}`).join('; ')
     // console.log(platformName, platformAccountName, tabId, cookieHeader)
     //todo 将cookies同步出去
+    console.log('post session ', '---------------------->')
     console.log(platformName, platformAccountName, tabId, platformCookies)
   }
 

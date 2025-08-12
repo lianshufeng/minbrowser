@@ -4,6 +4,41 @@ function cancel () {
   window.close()
 }
 
+function createErrorMessageContainer () {
+  const errorMessageContainer = document.createElement('div')
+  errorMessageContainer.id = 'error-message'
+  errorMessageContainer.style.display = 'none'
+  errorMessageContainer.style.position = 'fixed'
+  errorMessageContainer.style.top = '20px'
+  errorMessageContainer.style.left = '50%'
+  errorMessageContainer.style.transform = 'translateX(-50%)'
+  errorMessageContainer.style.backgroundColor = 'rgba(255, 0, 0, 0.8)'
+  errorMessageContainer.style.color = 'white'
+  errorMessageContainer.style.padding = '10px 20px'
+  errorMessageContainer.style.borderRadius = '5px'
+  errorMessageContainer.style.fontSize = '16px'
+
+  // 将 errorMessageContainer 加入到 body 中
+  document.body.appendChild(errorMessageContainer)
+}
+
+function showError (message) {
+  const errorMessageElement = document.getElementById('error-message')
+
+  // 如果没有 errorMessageContainer，就先创建它
+  if (!errorMessageElement) {
+    createErrorMessageContainer()
+  }
+
+  errorMessageElement.textContent = message // 设置错误信息
+  errorMessageElement.style.display = 'block' // 显示错误信息
+
+  // 2秒后隐藏提示框
+  setTimeout(() => {
+    errorMessageElement.style.display = 'none'
+  }, 2000)
+}
+
 function response () {
   const ua = document.getElementById('ua').value.trim()
   const proxy = document.getElementById('proxy').value.trim()
@@ -19,15 +54,15 @@ function response () {
   // ---- 校验逻辑 ----
   if (isSolated) {
     if (!platformType) {
-      alert('请选择平台类型')
+      showError('请选择平台类型')
       return
     }
     if (platformType === 'other' && !platformName) {
-      alert('请输入自定义平台名称')
+      showError('请输入自定义平台名称')
       return
     }
     if (!platformAccountName) {
-      alert('请输入平台账号名称')
+      showError('请输入平台账号名称')
       return
     }
   }

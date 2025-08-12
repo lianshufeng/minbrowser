@@ -13,7 +13,7 @@ function showSettingWindow (tabId, tabName, config = {}) {
     maxWidth: 600,
     maxHeight: 800,
     parent: windows.getCurrent(), // 可选
-    show: false,
+    // show: false,
     modal: true,
     alwaysOnTop: false,
     title: '设置独立会话',
@@ -30,7 +30,7 @@ function showSettingWindow (tabId, tabName, config = {}) {
   // win.loadFile('setting-window.html')
   win.loadURL('min://app/pages/solatedSession/index.html')
 
-  win.once('ready-to-show', () => win.show())
+  // win.once('ready-to-show', () => win.show())
 
   // 关闭时清空引用
   win.on('closed', () => win = null)
