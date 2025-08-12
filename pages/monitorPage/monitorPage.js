@@ -3,7 +3,7 @@ const { ipcRenderer } = require('electron')
 const MonitorPageConfigName = 'monitorPageConfig'
 let refreshTimer = null
 let snapshotTimer = null
-let syncSessionTimer = null  // 添加同步会话定时器
+let syncSessionTimer = null // 添加同步会话定时器
 let monitorPageConfig = null
 
 // 初始化配置加载
@@ -44,7 +44,10 @@ function setSettingConfig (winHandle, key, value) {
 }
 
 async function syncSessionAction (data) {
-  console.log('syncSessionAction', data)
+  const url = document.getElementById('sync-session-url').value
+  ipcRenderer.send('post-page-session', {
+    url: url
+  })
 }
 
 // 获取所有tab的快照
@@ -161,13 +164,13 @@ ipcRenderer.once('init-monitor-page-config', async (event, data) => {
 
   // 设置界面元素
   const settings = {
-    'refresh-interval': monitorPageConfig.refreshInterval,
-    'snapshot-interval': monitorPageConfig.snapshotInterval,
-    'refresh-enable': monitorPageConfig.refreshEnable,
-    'snapshot-enable': monitorPageConfig.snapshotEnable,
-    'sync-session-url': monitorPageConfig.syncSessionUrl,
-    'sync-session-enable': monitorPageConfig.syncSessionEnable,
-    'sync-session-interval': monitorPageConfig.syncSessionInterval
+    'refresh-interval': monitorPageConfig.refreshInterval || 120,
+    'snapshot-interval': monitorPageConfig.snapshotInterval || 3,
+    'refresh-enable': monitorPageConfig.refreshEnable || false,
+    'snapshot-enable': monitorPageConfig.snapshotEnable || false,
+    'sync-session-url': monitorPageConfig.syncSessionUrl || 'https://example.com/session-sync',
+    'sync-session-enable': monitorPageConfig.syncSessionEnable || false,
+    'sync-session-interval': monitorPageConfig.syncSessionInterval || 600
   }
 
   // 加载所有的配置到html上

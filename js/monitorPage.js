@@ -1,5 +1,7 @@
 const browserUI = require('./browserUI')
 var settings = require('util/settings/settings.js')
+const webviews = require('./webviews')
+const channels = require('./tabState/tab')
 
 const MonitorPage = {
   getAllTabs: function (channel, event, data) {
@@ -39,6 +41,14 @@ const MonitorPage = {
       ipc.send(data.outChannel, true)
     }
   },
+  getTabConfig: function (channel, event, data) {
+    if (data && data.outChannel) {
+      ipc.send(data.outChannel, tabs.get(data.tabId))
+    }
+  },
+  postPageSession: function (channel, event, data) {
+    console.log('postPageSession', channel, event, data)
+  },
   initialize: function () {
     ipc.on('get-all-tabs', MonitorPage.getAllTabs.bind(null, 'get-all-tabs'))
 
@@ -48,6 +58,10 @@ const MonitorPage = {
 
     ipc.on('get-setting-config', MonitorPage.getSettingConfig.bind(null, 'get-setting-config'))
     ipc.on('set-setting-config', MonitorPage.setSettingConfig.bind(null, 'set-setting-config'))
+
+    ipc.on('post-page-session', MonitorPage.postPageSession.bind(null, 'post-page-session'))
+
+    ipc.on('get-tab-config', MonitorPage.getTabConfig.bind(null, 'get-tab-config'))
 
   }
 }

@@ -193,7 +193,6 @@ const webviews = {
     const webPreferences = {}
     if (tabData.solatedSession) {
       if (tabData.solatedSession.isSolated) {
-        console.log(tabData)
         // 将类型转换为名称
         let platformName = tabData.solatedSession.platformName
         if (tabData.solatedSession.platformType !== 'other') {

@@ -86,3 +86,57 @@ ipc.on('refresh-tab-view', (event, data) => {
     view.webContents.reload()
   }
 })
+
+function getTabConfig (tabId) {
+  return new Promise((resolve, reject) => {
+    const outChannel = 'get-tab-config-' + new Date().getTime()
+    ipc.once(outChannel, (event, data) => {
+      resolve(data)
+    })
+    sendIPCToWindow(windows.getCurrent(), 'get-tab-config', {
+      tabId: tabId,
+      outChannel: outChannel
+    })
+  })
+}
+
+// 推送页面的会话
+ipc.on('post-page-session', async (event, data) => {
+  // sendIPCToWindow(windows.getCurrent(), 'post-page-session', data)
+
+  for (let tabId in viewMap) {
+
+    // 取出配置
+    const tabConfig = await getTabConfig(tabId)
+    if (!tabConfig) {
+      continue
+    }
+    const solatedSession = tabConfig.solatedSession
+    if (!solatedSession || solatedSession.isSolated !== true) { // 仅支持独立会话的tab
+      continue
+    }
+    const platformName = (solatedSession.platformType === 'other') ? solatedSession.platformName : solatedSession.platformType
+    const platformAccountName = solatedSession.platformAccountName
+
+    // 视图
+    const view = viewMap[tabId]
+    if (!view) {
+      continue
+    }
+
+    const viewSession = view.webContents.session
+    const cookies = await viewSession.cookies.get({})
+
+    const platformCookies = cookies.filter(cookie => {
+      // 只匹配以 .douyin.com 结尾的域名
+      return cookie.domain.endsWith(solatedSession.platformType === 'other' ? '' : platformName)
+    }).map(cookie => `${cookie.name}=${cookie.value}`).join('; ')
+
+    // 生成 cookies header 字符串
+    // const cookieHeader = cookies.map(cookie => `${cookie.name}=${cookie.value}`).join('; ')
+    // console.log(platformName, platformAccountName, tabId, cookieHeader)
+    //todo 将cookies同步出去
+    console.log(platformName, platformAccountName, tabId, platformCookies)
+  }
+
+})
