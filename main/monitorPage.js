@@ -1,3 +1,6 @@
+const http = require('http')
+const https = require('https')
+
 function openMonitorPage () {
   const win = new BrowserWindow({
     width: 1366,
@@ -52,7 +55,7 @@ function openMonitorPage () {
   })
 
   // 打开调试页面
-  win.webContents.openDevTools({ mode: 'detach' })
+  // win.webContents.openDevTools({ mode: 'detach' })
 }
 
 // 选择tab
@@ -100,10 +103,67 @@ function getTabConfig (tabId) {
   })
 }
 
+function postJson (url, data) {
+  return new Promise((resolve, reject) => {
+    // 解析 URL
+    const urlObj = new URL(url)
+
+    // 根据协议选择 http 或 https
+    const requestModule = urlObj.protocol === 'https:' ? https : http
+
+    // 获取端口号，如果 URL 中没有端口，则使用默认端口
+    const port = urlObj.port || (urlObj.protocol === 'https:' ? 443 : 80)
+
+    // 配置请求参数
+    const options = {
+      hostname: urlObj.hostname,
+      port: port,
+      path: urlObj.pathname,
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': Buffer.byteLength(JSON.stringify(data)),
+      },
+    }
+
+    // 创建请求
+    const req = requestModule.request(options, (res) => {
+      let responseData = ''
+
+      res.on('data', (chunk) => {
+        responseData += chunk
+      })
+
+      res.on('end', () => {
+        try {
+          // 成功时返回解析后的响应数据
+          resolve(JSON.parse(responseData))
+        } catch (error) {
+          // 解析错误时抛出错误
+          reject(new Error('Error parsing response: ' + error.message))
+        }
+      })
+    })
+
+    req.on('error', (error) => {
+      // 请求出错时抛出错误
+      reject(new Error('Request error: ' + error.message))
+    })
+
+    // 发送 JSON 数据
+    req.write(JSON.stringify(data))
+
+    // 结束请求
+    req.end()
+  })
+}
+
 // 推送页面的会话
 ipc.on('post-page-session', async (event, data) => {
   // sendIPCToWindow(windows.getCurrent(), 'post-page-session', data)
 
+  const items = []
+  const url = data.url.trim()
   for (let tabId in viewMap) {
 
     // 取出配置
@@ -127,17 +187,41 @@ ipc.on('post-page-session', async (event, data) => {
     const viewSession = view.webContents.session
     const cookies = await viewSession.cookies.get({})
 
-    const platformCookies = cookies.filter(cookie => {
-      // 只匹配以 .douyin.com 结尾的域名
-      return cookie.domain.endsWith(solatedSession.platformType === 'other' ? '' : platformName)
-    }).map(cookie => `${cookie.name.trim()}=${cookie.value.trim()}`).join('; ')
+    const domain_cookies_map = {
+      douyin: ['.douyin.com'],
+      kuaishou: ['.kuaishou.com'],
+      xiaohongshu: ['.xiaohongshu.com'],
+      bilibili: ['.bilibili.com']
+    }
 
-    // 生成 cookies header 字符串
-    // const cookieHeader = cookies.map(cookie => `${cookie.name}=${cookie.value}`).join('; ')
-    // console.log(platformName, platformAccountName, tabId, cookieHeader)
-    //todo 将cookies同步出去
-    console.log('post session ', '---------------------->')
-    console.log(platformName, platformAccountName, tabId, platformCookies)
+    const platformCookies = cookies
+      .filter(cookie => {
+        const validDomains = domain_cookies_map[platformName] || [] // 获取对应平台的有效域名数组，如果没有则使用空数组
+        return validDomains.length === 0 || validDomains.some(domain => cookie.domain.endsWith(domain))
+      })
+      .map(cookie => {
+        // 去除 cookie 的 name 和 value 中的换行符、回车符以及多余的空白字符
+        const name = cookie.name.trim() // 去除换行符、回车符和多余空格
+        const value = cookie.value.trim() // 去除换行符、回车符和多余空格
+        return `${name}=${value}`
+      })
+      .join('; ')
+
+    items.push({
+      tabId: tabId,
+      platformName: platformName,
+      platformAccountName: platformAccountName,
+      cookies: platformCookies
+    })
+  }
+
+  try {
+    const ret = await postJson(url, {
+      items: items
+    })
+    console.log('Response:', JSON.stringify(ret))
+  } catch (e) {
+    console.error(e)
   }
 
 })
