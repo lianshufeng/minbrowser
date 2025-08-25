@@ -137,7 +137,7 @@ function postJson (url, data) {
       res.on('end', () => {
         try {
           // 成功时返回解析后的响应数据
-          resolve(JSON.parse(responseData))
+          resolve(responseData)
         } catch (error) {
           // 解析错误时抛出错误
           reject(new Error('Error parsing response: ' + error.message))
@@ -219,7 +219,7 @@ ipc.on('post-page-session', async (event, data) => {
     const ret = await postJson(url, {
       items: items
     })
-    console.log('Response:', JSON.stringify(ret))
+    console.log('Response:', ret)
   } catch (e) {
     console.error(e)
   }
